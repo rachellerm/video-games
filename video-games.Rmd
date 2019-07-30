@@ -1,0 +1,80 @@
+---
+title: "Time Spent Playing Video Games in 2018. Is there cause for concern?"
+author: "Rachel Lerm"
+date: "23 March 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Source
+Limelight Networks, Inc. (2018). The State of Online Gaming 2018. *Limelight Networks.* Retrieved from https://www.limelight.com/resources/white-paper/state-of-online-gaming-2018/
+
+## Code
+The data visualisation focused on using R and the ggplot2() package.
+
+```{r}
+# Load ggplot2 package
+library (ggplot2)
+
+# Load the data
+gameplay_data <- read.csv("gameplay_data_long.csv")
+
+# Reorder the avg hours played factor (ordinal variable)
+gameplay_data$Avg_Hours_PlayedO = factor(gameplay_data$Avg_Hours_Played, 
+levels=c('< 1 hour','1-2 hours',
+         '2-4 hours','4-7 hours',
+         '7-12 hours', '12-20 hours',
+         '> 20 hours'))
+
+# - Variables of Interest
+# Age Group (ordinal variable)
+# Average Hours Played (ordinal variable)
+# Percentage Value (ordinal variable)
+
+# - Create data visualisation object using ggplot2
+# Define data layer (variables of interest)
+# Define aesthetics layer (x-axis, y-axis, and fill)
+# Define geometry layer
+barplot1 <- ggplot(gameplay_data, aes(x=Age, y=Value, fill=Age)) + 
+geom_bar(stat="identity") +
+scale_fill_manual(values = c('#8b0000', '#c22514', '#ea583c', '#ff8f76', '#ffcabd'))
+
+# Scale y-axis and format as percentage
+barplot1 <- barplot1 + scale_y_continuous(labels = 
+scales::percent_format(accuracy = 1))
+
+# Define the facets layer (along rows)
+barplot1 <- barplot1 + facet_grid(.~Avg_Hours_PlayedO) 
+
+# Modify title, axes and legend labels
+barplot1 <- barplot1 + ggtitle("Time Spent Playing Video Games in 2018", 
+subtitle = "Is there cause for concern?") +
+xlab("Average Video Game Play (hours per week)") +
+ylab("Gamers (percentage)") +
+labs(fill='Age Group') 
+
+# Add caption for the data source
+barplot1 <- barplot1 + labs(caption="Source: Limelight Networks Inc., 2018.")
+
+# Change the appearance of the title, axes, legend and caption
+barplot1 <- barplot1 + theme(
+  plot.title = element_text(size=14, face="bold", hjust=0.5),
+  plot.subtitle=element_text(size=12, hjust=0.5),
+  axis.title = element_text(size=10, vjust=0.5, hjust=0.5),
+  axis.text.x=element_blank(),
+  axis.ticks.x=element_blank(),
+  legend.title = element_text(size=9, face="bold"),
+  legend.position="bottom", 
+  legend.box = "horizontal",
+  plot.caption=element_text(size=8, hjust=0.5, vjust=-1))
+
+```
+
+## Visualisation
+```{r, echo=FALSE}
+# Display the final result
+barplot1
+```
